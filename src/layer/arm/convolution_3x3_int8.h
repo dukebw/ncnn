@@ -19,6 +19,10 @@
 
 static void conv3x3s1_transform_kernel_int8_neon(const Mat& _kernel, Mat& kernel_tm, int inch, int outch)
 {
+    /**
+     * TODO(brendan): Why is outch divided by 4 here? Maybe an optimization to
+     * use 32-bit operations?
+     */
     kernel_tm.create(4*9, inch, outch/4 + outch%4, (size_t)1u);
 
     const signed char* kernel = _kernel;

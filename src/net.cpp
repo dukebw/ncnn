@@ -99,6 +99,14 @@ int Net::register_custom_layer(int index, layer_creator_func creator)
 
 #if NCNN_STDIO
 #if NCNN_STRING
+/**
+ * NOTE(brendan): Don't load weights, just set up the "graph structure" of the
+ * network.
+ *
+ * The structure is stored as a set of blobs and layers. Each blob has a
+ * producer and list of consumers. The layers store configuration information,
+ * e.g., kernel width and height, which is what is meant by loading "params".
+ */
 int Net::load_param(FILE* fp)
 {
     int magic = 0;
