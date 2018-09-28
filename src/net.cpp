@@ -640,6 +640,13 @@ Layer* Net::create_custom_layer(int index)
     return layer_creator();
 }
 
+/**
+ * NOTE(brendan): Call forward on the net by calling forward_layer with the
+ * desired output, which will recursively call forward_layer until a layer's
+ * bottom blob exists.
+ *
+ * Call forward, or forward_inplace
+ */
 int Net::forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt) const
 {
     const Layer* layer = layers[layer_index];

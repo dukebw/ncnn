@@ -22,6 +22,8 @@ static void conv3x3s1_transform_kernel_int8_neon(const Mat& _kernel, Mat& kernel
     /**
      * TODO(brendan): Why is outch divided by 4 here? Maybe an optimization to
      * use 32-bit operations?
+     *
+     * kernel_tm is a [4*9, inch, outch/4 + outch mod 4] tensor.
      */
     kernel_tm.create(4*9, inch, outch/4 + outch%4, (size_t)1u);
 
@@ -30,6 +32,10 @@ static void conv3x3s1_transform_kernel_int8_neon(const Mat& _kernel, Mat& kernel
     int p=0;
     for (; p+3<outch; p+=4)
     {
+        /**
+         * NOTE(brendan): k0-k3 point to this out channel to three out channels
+         * ahead.
+         */
         const signed char* k0 = kernel + (p+0)*inch*9;
         const signed char* k1 = kernel + (p+1)*inch*9;
         const signed char* k2 = kernel + (p+2)*inch*9;
@@ -37,6 +43,12 @@ static void conv3x3s1_transform_kernel_int8_neon(const Mat& _kernel, Mat& kernel
 
         signed char* ktmp = kernel_tm.channel(p/4);
 
+        /*
+         * NOTE(brendan): here the out channel and three out channels ahead are
+         * packed into 32 bits. So each 32 bits is
+         * [outchN, outchN+1, outchN+2, outchN+3]. The 9-element kernels are
+         * thus interleaved.
+         */
         for (int q=0; q<inch; q++)
         {
             for (int k=0; k<9; k++)
