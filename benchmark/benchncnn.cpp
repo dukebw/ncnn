@@ -296,8 +296,9 @@ void mnasnet_run(const ncnn::Net& net)
 
 int main(int argc, char** argv)
 {
-    int loop_count = 4;
-    int num_threads = ncnn::get_cpu_count();
+    int loop_count = 40;
+    /* int num_threads = ncnn::get_cpu_count(); */
+    int num_threads = 1;
     int powersave = 0;
 
     if (argc >= 2)
@@ -336,29 +337,29 @@ int main(int argc, char** argv)
     fprintf(stderr, "powersave = %d\n", ncnn::get_cpu_powersave());
 
     // run
-    benchmark("squeezenet", squeezenet_init, squeezenet_run);
+    /* benchmark("squeezenet", squeezenet_init, squeezenet_run); */
 
-    benchmark("mobilenet", mobilenet_init, mobilenet_run);
+    /* benchmark("mobilenet", mobilenet_init, mobilenet_run); */
 
     benchmark("mobilenet_v2", mobilenet_v2_init, mobilenet_v2_run);
 
-    benchmark("shufflenet", shufflenet_init, shufflenet_run);
+    /* benchmark("shufflenet", shufflenet_init, shufflenet_run); */
 
-//     benchmark("mnasnet", mnasnet_init, mnasnet_run); FIXME the mnasnet.param is wrong
+/* //     benchmark("mnasnet", mnasnet_init, mnasnet_run); FIXME the mnasnet.param is wrong */
 
-    benchmark("googlenet", googlenet_init, googlenet_run);
+    /* benchmark("googlenet", googlenet_init, googlenet_run); */
 
-    benchmark("resnet18", resnet18_init, resnet18_run);
+    /* benchmark("resnet18", resnet18_init, resnet18_run); */
 
-    benchmark("alexnet", alexnet_init, alexnet_run);
+    /* benchmark("alexnet", alexnet_init, alexnet_run); */
 
-    benchmark("vgg16", vgg16_init, vgg16_run);
+    /* benchmark("vgg16", vgg16_init, vgg16_run); */
 
-    benchmark("squeezenet-ssd", squeezenet_ssd_init, squeezenet_ssd_run);
+    /* benchmark("squeezenet-ssd", squeezenet_ssd_init, squeezenet_ssd_run); */
 
-    benchmark("mobilenet-ssd", mobilenet_ssd_init, mobilenet_ssd_run);
+    /* benchmark("mobilenet-ssd", mobilenet_ssd_init, mobilenet_ssd_run); */
 
-    benchmark("mobilenet-yolo", mobilenet_yolo_init, mobilenet_yolo_run);
+    /* benchmark("mobilenet-yolo", mobilenet_yolo_init, mobilenet_yolo_run); */
 
     return 0;
 }

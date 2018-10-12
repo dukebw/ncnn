@@ -36,6 +36,13 @@ if(NCNN_OPENMP)
     endif()
 endif()
 
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --preload-file squeezenet.param")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --preload-file squeezenet.param")
+# if (NOT CMAKE_EXECUTABLE_SUFFIX STREQUAL ".js")
+#         message(FATAL_ERROR "The default suffix for building executables should be .js!")
+# endif()
+# set(CMAKE_EXECUTABLE_SUFFIX ".html")
+
 if(WIN32)
     add_definitions(-D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE)
     add_definitions(-DNOMINMAX)
@@ -44,7 +51,8 @@ else()
 
     add_definitions(-fPIC)
     if(CMAKE_BUILD_TYPE MATCHES "(Release|RELEASE|release)")
-        add_definitions(-Ofast)
+        # add_definitions(-Ofast)
+        add_definitions(-O3)
 
         add_definitions(-ffast-math)
     endif()
@@ -68,7 +76,7 @@ endif()
 ##############################################
 
 # add_subdirectory(examples)
-# add_subdirectory(benchmark)
+add_subdirectory(benchmark)
 add_subdirectory(src)
 if(NOT ANDROID AND NOT IOS)
 add_subdirectory(tools)
