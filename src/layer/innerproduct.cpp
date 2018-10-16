@@ -44,8 +44,10 @@ int InnerProduct::load_param(const ParamDict& pd)
 
     use_int8_inference = pd.use_int8_inference;
 
-    if (int8_scale_term == 0)
+    if (int8_scale_term == 0) {
+        fprintf(stderr, "disabling int8 for InnerProduct\n");
         use_int8_inference = false;
+    }
 
     return 0;
 }

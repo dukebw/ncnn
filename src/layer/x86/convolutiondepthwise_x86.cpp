@@ -119,6 +119,7 @@ int ConvolutionDepthWise_x86::load_model(const ModelBin& mb)
 
 int ConvolutionDepthWise_x86::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
 {
+    fprintf(stderr, "    ConvolutionDepthWise_x86::forward\n");
     // convolv with NxN kernel
     // value = value + bias
 

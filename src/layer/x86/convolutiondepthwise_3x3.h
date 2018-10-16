@@ -14,6 +14,7 @@
 
 static void convdw3x3s1_sse(const Mat& bottom_blob, Mat& top_blob, const Mat& _kernel, const Mat& _bias, const Option& opt)
 {
+    fprintf(stderr, "        convdw3x3s1_sse\n");
     int w = bottom_blob.w;
 
     int outw = top_blob.w;
@@ -132,6 +133,7 @@ static void convdw3x3s1_sse(const Mat& bottom_blob, Mat& top_blob, const Mat& _k
 
 static void convdw3x3s2_sse(const Mat& bottom_blob, Mat& top_blob, const Mat& _kernel, const Mat& _bias, const Option& opt)
 {
+    fprintf(stderr, "        convdw3x3s2_sse\n");
     int w = bottom_blob.w;
 
     int outw = top_blob.w;

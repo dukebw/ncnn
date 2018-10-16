@@ -131,6 +131,7 @@ int Convolution_x86::forwardDilation(const Mat& bottom_blob, Mat& top_blob, conv
 
 int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
 {
+    fprintf(stderr, "    Convolution_x86::forward\n");
     // convolv with NxN kernel
     // value = value + bias
 

@@ -14,6 +14,7 @@
 
 static void convdw3x3s1_int8_sse(const Mat &bottom_blob, Mat &top_blob, const Mat &_kernel, const Option& opt)
 {
+    fprintf(stderr, "        convdw3x3s1_int8_sse\n");
     int w = bottom_blob.w;
     //int h = bottom_blob.h;
     //int inch = bottom_blob.c;
@@ -78,6 +79,7 @@ static void convdw3x3s1_int8_sse(const Mat &bottom_blob, Mat &top_blob, const Ma
 
 static void convdw3x3s2_int8_sse(const Mat &bottom_blob, Mat &top_blob, const Mat &_kernel, const Option& opt)
 {
+    fprintf(stderr, "        convdw3x3s2_int8_sse\n");
     int w = bottom_blob.w;
     //int h = bottom_blob.h;
     //int inch = bottom_blob.c;

@@ -63,8 +63,11 @@ int ConvolutionDepthWise::load_param(const ParamDict& pd)
         return -100;
     }
 
-    if (int8_scale_term == 0)
-        use_int8_inference = false;
+    if (int8_scale_term == 0) {
+        int8_scale_term = 1;
+        /* fprintf(stderr, "disabling int8 for ConvolutionDepthWise\n"); */
+        /* use_int8_inference = false; */
+    }
 
     return 0;
 }

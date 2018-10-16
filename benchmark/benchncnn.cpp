@@ -296,7 +296,8 @@ void mnasnet_run(const ncnn::Net& net)
 
 int main(int argc, char** argv)
 {
-    int loop_count = 40;
+    /* int loop_count = 40; */
+    int loop_count = 1;
     /* int num_threads = ncnn::get_cpu_count(); */
     int num_threads = 1;
     int powersave = 0;

@@ -14,6 +14,7 @@
 
 static void conv3x3s1_sse(const Mat& bottom_blob, Mat& top_blob, const Mat& _kernel, const Mat& _bias, const Option& opt)
 {
+    fprintf(stderr, "        conv3x3s1_sse\n");
     int w = bottom_blob.w;
     int inch = bottom_blob.c;
 

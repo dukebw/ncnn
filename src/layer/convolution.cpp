@@ -52,8 +52,11 @@ int Convolution::load_param(const ParamDict& pd)
 
     use_int8_inference = pd.use_int8_inference;
 
-    if (int8_scale_term == 0)
-        use_int8_inference = false;
+    if (int8_scale_term == 0) {
+        int8_scale_term = 1;
+        /* fprintf(stderr, "disabling int8 for Convolution\n"); */
+        /* use_int8_inference = false; */
+    }
 
     return 0;
 }
@@ -140,6 +143,8 @@ int Convolution::load_model(const ModelBin& mb)
 
 int Convolution::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
 {
+    fprintf(stderr, "    Convolution::forward\n");
+
     // convolv with NxN kernel
     // value = value + bias
 

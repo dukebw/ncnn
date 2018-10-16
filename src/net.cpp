@@ -215,6 +215,7 @@ int Net::load_param(FILE* fp)
             blob_index++;
         }
 
+        fprintf(stderr, "%-24s %-24s\n", layer->type.c_str(), layer->name.c_str());
         // layer specific params
         int pdlr = pd.load_param(fp);
         if (pdlr != 0)
@@ -831,6 +832,8 @@ int Net::forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt
                 bottom_blob = bottom_blob.clone();
             }
         }
+
+        fprintf(stderr, "%-24s %-24s\n", layer->type.c_str(), layer->name.c_str());
 
         // forward
         if (opt.lightmode && layer->support_inplace)
