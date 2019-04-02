@@ -205,6 +205,10 @@ static void conv3x3s2_transform_kernel_int8_neon(const Mat& _kernel, Mat& kernel
     int p=0;
     for (; p+7<outch; p+=8)
     {
+        /**
+         * NOTE(brendan): k0-k3 point to this out channel to three out channels
+         * ahead.
+         */
         const signed char* k0 = kernel + (p+0)*inch*9;
         const signed char* k1 = kernel + (p+1)*inch*9;
         const signed char* k2 = kernel + (p+2)*inch*9;
@@ -216,6 +220,12 @@ static void conv3x3s2_transform_kernel_int8_neon(const Mat& _kernel, Mat& kernel
 
         signed char* ktmp = kernel_tm.channel(p/8);
 
+        /*
+         * NOTE(brendan): here the out channel and three out channels ahead are
+         * packed into 32 bits. So each 32 bits is
+         * [outchN, outchN+1, outchN+2, outchN+3]. The 9-element kernels are
+         * thus interleaved.
+         */
         for (int q=0; q<inch; q++)
         {
             for (int k=0; k<9; k++)
