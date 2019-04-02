@@ -2,10 +2,10 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/../src)
 
-add_executable(benchncnn benchncnn.cpp)
+add_executable(benchncnn benchncnn.cpp cnpy.cpp)
 set_property(TARGET benchncnn PROPERTY COMPILE_FLAGS "-fpie")
 set_property(TARGET benchncnn PROPERTY LINK_FLAGS "-pie")
-target_link_libraries(benchncnn PRIVATE ncnn)
+target_link_libraries(benchncnn PRIVATE ncnn z)
 
 if(NCNN_VULKAN)
     target_link_libraries(benchncnn PRIVATE ${Vulkan_LIBRARY})

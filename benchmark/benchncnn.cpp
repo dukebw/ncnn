@@ -14,6 +14,7 @@
 
 #include <float.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef _WIN32
 #define NOMINMAX
@@ -26,6 +27,8 @@
 #include "benchmark.h"
 #include "cpu.h"
 #include "net.h"
+
+#include "cnpy.h"
 
 #if NCNN_VULKAN
 #include "gpu.h"
@@ -161,6 +164,53 @@ void benchmark(const char* comment, void (*init)(ncnn::Net&), void (*run)(const 
     time_avg /= g_loop_count;
 
     fprintf(stderr, "%20s  min = %7.2f  max = %7.2f  avg = %7.2f\n", comment, time_min, time_max, time_avg);
+}
+
+void bilateralslice_init(ncnn::Net& net)
+{
+    net.load_param("bilateralslice.param");
+}
+
+void bilateralslice_run(const ncnn::Net& net)
+{
+    ncnn::Extractor ex = net.create_extractor();
+
+    cnpy::NpyArray grid_npy = cnpy::npy_load("grid.npy");
+    cnpy::NpyArray guide_npy = cnpy::npy_load("guide.npy");
+    cnpy::NpyArray input_npy = cnpy::npy_load("input.npy");
+
+    ncnn::Mat grid{6, 10, 96, grid_npy.data<void>()};
+    ex.input("grid", grid);
+
+    ncnn::Mat guide{60, 101, guide_npy.data<void>()};
+    ex.input("guide", guide);
+
+    ncnn::Mat input{60, 101, 3, input_npy.data<void>()};
+    ex.input("input", input);
+
+    cnpy::NpyArray tf_out_npy = cnpy::npy_load("tf_output_transposed.npy");
+    cnpy::NpyArray tf_out_no_offs_npy = cnpy::npy_load("tf_output_no_offset_transposed.npy");
+
+    ncnn::Mat out;
+    ex.extract("bislice", out);
+
+    double sum = 0.0;
+    double max_abs_diff = 0.0;
+    constexpr int32_t total = 60*101*3;
+    for (uint32_t i = 0;
+         i < total;
+         ++i) {
+            float *out_data = (float *)out.data + i;
+            float *tf_out_data = tf_out_npy.data<float>() + i;
+            double abs_diff = abs(*out_data - *tf_out_data);
+            sum += abs(*tf_out_data);
+            if (abs_diff > max_abs_diff)
+                    max_abs_diff = abs_diff;
+    }
+    fprintf(stderr,
+            "max abs diff: %.6f mean abs: %.6f\n",
+            max_abs_diff,
+            sum/total);
 }
 
 void squeezenet_init(ncnn::Net& net)
@@ -514,6 +564,8 @@ int main(int argc, char** argv)
     fprintf(stderr, "gpu_device = %d\n", gpu_device);
 
     // run
+    benchmark("bilateralslice", bilateralslice_init, bilateralslice_run);
+
     benchmark("squeezenet", squeezenet_init, squeezenet_run);
 
 #if NCNN_VULKAN
