@@ -1,0 +1,7 @@
+7767517
+5 5
+Input            highres          0 1 highres 0=3 1=512 2=512
+Convolution      ConvNd_1         1 1 highres ConvNd_1 0=3 1=1 2=1 3=1 4=0 5=1 6=9
+PiecewiseThresh  Threshold_1      1 1 ConvNd_1 Threshold_1
+Convolution      ConvNd_2         1 1 Threshold_1 ConvNd_2 0=1 1=1 2=1 3=1 4=0 5=1 6=3
+Clip             Hardtanh_1       1 1 ConvNd_2 Hardtanh_1 0=0 1=1

@@ -134,7 +134,7 @@ void benchmark(const char* comment, void (*init)(ncnn::Net&), void (*run)(const 
 #ifdef _WIN32
     Sleep(10 * 1000);
 #else
-    sleep(10);
+    sleep(1);
 #endif
 
     // warm up
@@ -164,6 +164,26 @@ void benchmark(const char* comment, void (*init)(ncnn::Net&), void (*run)(const 
     time_avg /= g_loop_count;
 
     fprintf(stderr, "%20s  min = %7.2f  max = %7.2f  avg = %7.2f\n", comment, time_min, time_max, time_avg);
+}
+
+void hdrnet_init(ncnn::Net& net)
+{
+    net.load_param("hdrnet.param");
+}
+
+void hdrnet_run(const ncnn::Net& net)
+{
+    ncnn::Extractor ex = net.create_extractor();
+
+    ncnn::Mat lowres{256, 256, 3};
+    ex.input("lowres", lowres);
+    ncnn::Mat highres{512, 512, 3};
+    ex.input("highres", highres);
+
+    ncnn::Mat out_coeff;
+    ex.extract("Concat_1", out_coeff);
+    ncnn::Mat out_guidemap;
+    ex.extract("Hardtanh_1", out_guidemap);
 }
 
 void bilateralslice_init(ncnn::Net& net)
@@ -564,6 +584,9 @@ int main(int argc, char** argv)
     fprintf(stderr, "gpu_device = %d\n", gpu_device);
 
     // run
+    benchmark("hdrnet", hdrnet_init, hdrnet_run);
+    exit(EXIT_SUCCESS);
+
     benchmark("bilateralslice", bilateralslice_init, bilateralslice_run);
 
     benchmark("squeezenet", squeezenet_init, squeezenet_run);

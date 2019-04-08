@@ -222,6 +222,7 @@ ncnn_add_layer(Packing)
 ncnn_add_layer(Requantize)
 ncnn_add_layer(Cast)
 ncnn_add_layer(BilateralSlice)
+ncnn_add_layer(PiecewiseThresh)
 
 add_custom_target(generate-spirv DEPENDS ${SHADER_SPV_HEX_FILES})
 

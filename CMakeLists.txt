@@ -59,7 +59,7 @@ if(WIN32)
 else()
     add_definitions(-Wall -Wextra -Wno-unused-function)
 
-    add_definitions(-fPIC)
+    add_definitions(-fPIC -ggdb3)
     if(CMAKE_BUILD_TYPE MATCHES "(Release|RELEASE|release)")
         if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
             add_definitions(-Ofast)
