@@ -168,22 +168,62 @@ void benchmark(const char* comment, void (*init)(ncnn::Net&), void (*run)(const 
 
 void hdrnet_init(ncnn::Net& net)
 {
-    net.load_param("hdrnet.param");
+    net.clear();
+    net.load_param("hdrnet_coefficients_new.param");
+    net.load_model("processed.bin");
 }
 
 void hdrnet_run(const ncnn::Net& net)
 {
     ncnn::Extractor ex = net.create_extractor();
 
-    ncnn::Mat lowres{256, 256, 3};
-    ex.input("lowres", lowres);
-    ncnn::Mat highres{512, 512, 3};
-    ex.input("highres", highres);
+    cnpy::NpyArray lowres_npy = cnpy::npy_load("lowRes.npy");
+    cnpy::NpyArray highres_npy = cnpy::npy_load("highRes.npy");
+    cnpy::NpyArray coefficient_npy = cnpy::npy_load("features.npy");
+
+
+    
+    // ncnn::Mat lowres{256, 256, 3, lowres_npy.data<void>()};
+    // ex.input("lowres", lowres);
+    // ncnn::Mat highres{512, 512, 3, highres_npy.data<void>()};
+    // ex.input("highres", highres);
+
+    ncnn::Mat lowres{256, 256, 3, lowres_npy.data<void>()};
+    ex.input("data", lowres);
 
     ncnn::Mat out_coeff;
-    ex.extract("Concat_1", out_coeff);
-    ncnn::Mat out_guidemap;
-    ex.extract("Hardtanh_1", out_guidemap);
+    ex.extract("ConvNd_1", out_coeff);
+    //ncnn::Mat out_guidemap;
+    //ex.extract("Hardtanh_1", out_guidemap);
+
+    fprintf(stderr,
+            "w: %.d, h:%.d c:%.d\n",
+            out_coeff.w, out_coeff.h, out_coeff.c);
+    fprintf(stderr,
+            "test: %.6f\n",
+            out_coeff[2000]);
+
+    double sum = 0.0;
+    double max_abs_diff = 0.0;
+    constexpr int32_t total = 128*128*8;
+    for (uint32_t i = 0;
+         i < total;
+         ++i) {
+            float *out_data = (float *)out_coeff.data + i;
+            float *tf_out_data = coefficient_npy.data<float>() + i;
+
+            // if (i < 1000) {
+            //     fprintf(stderr,"first number: %.6f and %.6f\n", *out_data, *tf_out_data);
+            // }
+            double abs_diff = abs(*out_data - *tf_out_data);
+            sum += abs_diff;
+            if (abs_diff > max_abs_diff)
+                    max_abs_diff = abs_diff;
+    }
+    fprintf(stderr,
+            "max abs diff: %.6f mean abs: %.6f\n",
+            max_abs_diff,
+            sum/total);
 }
 
 void bilateralslice_init(ncnn::Net& net)
@@ -520,7 +560,7 @@ void mobilenet_yolov3_run(const ncnn::Net& net)
 
 int main(int argc, char** argv)
 {
-    int loop_count = 4;
+    int loop_count = 1;
     int num_threads = ncnn::get_cpu_count();
     int powersave = 0;
     int gpu_device = -1;
