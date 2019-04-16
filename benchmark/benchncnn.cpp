@@ -89,7 +89,7 @@ public:
 
 } // namespace ncnn
 
-static int g_loop_count = 4;
+static int g_loop_count = 1;
 
 static ncnn::UnlockedPoolAllocator g_blob_pool_allocator;
 static ncnn::PoolAllocator g_workspace_pool_allocator;
@@ -117,7 +117,7 @@ void benchmark(const char* comment, void (*init)(ncnn::Net&), void (*run)(const 
 
     init(net);
 
-    net.load_model();
+    //net.load_model();
 
     g_blob_pool_allocator.clear();
     g_workspace_pool_allocator.clear();
@@ -168,9 +168,11 @@ void benchmark(const char* comment, void (*init)(ncnn::Net&), void (*run)(const 
 
 void hdrnet_init(ncnn::Net& net)
 {
-    net.clear();
-    net.load_param("hdrnet_coefficients_new.param");
-    net.load_model("processed.bin");
+    net.load_param("hdrnet_final.param");
+    net.load_model("concate.bin");
+
+    // net.load_param("hdrnet_guidemap.param");
+    // net.load_model("hdrnet_guidemap.bin");
 }
 
 void hdrnet_run(const ncnn::Net& net)
@@ -179,49 +181,47 @@ void hdrnet_run(const ncnn::Net& net)
 
     cnpy::NpyArray lowres_npy = cnpy::npy_load("lowRes.npy");
     cnpy::NpyArray highres_npy = cnpy::npy_load("highRes.npy");
-    cnpy::NpyArray coefficient_npy = cnpy::npy_load("features.npy");
+    cnpy::NpyArray coefficient_npy = cnpy::npy_load("coefficients.npy");
 
 
     
-    // ncnn::Mat lowres{256, 256, 3, lowres_npy.data<void>()};
-    // ex.input("lowres", lowres);
-    // ncnn::Mat highres{512, 512, 3, highres_npy.data<void>()};
-    // ex.input("highres", highres);
+    ncnn::Mat highres{512, 512, 3, highres_npy.data<void>()};
+    ex.input("highres", highres);
 
     ncnn::Mat lowres{256, 256, 3, lowres_npy.data<void>()};
-    ex.input("data", lowres);
+    ex.input("lowres", lowres);
 
     ncnn::Mat out_coeff;
-    ex.extract("ConvNd_1", out_coeff);
-    //ncnn::Mat out_guidemap;
-    //ex.extract("Hardtanh_1", out_guidemap);
+    ex.extract("ConvNd_9", out_coeff);
+    // ncnn::Mat out_guidemap;
+    // ex.extract("Hardtanh_1", out_guidemap);
 
     fprintf(stderr,
             "w: %.d, h:%.d c:%.d\n",
             out_coeff.w, out_coeff.h, out_coeff.c);
     fprintf(stderr,
-            "test: %.6f\n",
-            out_coeff[2000]);
+            "test: %.8f\n",
+            out_coeff[0]);
 
     double sum = 0.0;
     double max_abs_diff = 0.0;
-    constexpr int32_t total = 128*128*8;
+    constexpr int32_t total = 96*16*16;
     for (uint32_t i = 0;
          i < total;
          ++i) {
             float *out_data = (float *)out_coeff.data + i;
             float *tf_out_data = coefficient_npy.data<float>() + i;
 
-            // if (i < 1000) {
-            //     fprintf(stderr,"first number: %.6f and %.6f\n", *out_data, *tf_out_data);
-            // }
+            if (i < 300) {
+                fprintf(stderr,"first number: %.6f and %.6f\n", *out_data, *tf_out_data);
+            }
             double abs_diff = abs(*out_data - *tf_out_data);
             sum += abs_diff;
             if (abs_diff > max_abs_diff)
                     max_abs_diff = abs_diff;
     }
     fprintf(stderr,
-            "max abs diff: %.6f mean abs: %.6f\n",
+            "max abs diff: %.8f mean abs: %.8f\n",
             max_abs_diff,
             sum/total);
 }

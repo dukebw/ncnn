@@ -1,8 +1,7 @@
 7767517
-42 50
-Input            lowres           0 1 lowres 0=3 1=256 2=256
-Input            highres          0 1 highres 0=3 1=512 2=512
-Convolution      ConvNd_1         1 1 lowres ConvNd_1 0=8 1=3 2=1 3=2 4=1 5=1 6=216
+31 39
+Input            data             0 1 data 0=3 1=256 2=256
+Convolution      ConvNd_1         1 1 data ConvNd_1 0=8 1=3 2=1 3=2 4=1 5=1 6=216
 ReLU             Threshold_1      1 1 ConvNd_1 Threshold_1 0=0.000000
 Convolution      ConvNd_2         1 1 Threshold_1 ConvNd_2 0=16 1=3 2=1 3=2 4=1 5=1 6=1152
 ReLU             Threshold_2      1 1 ConvNd_2 Threshold_2 0=0.000000
@@ -25,20 +24,10 @@ Flatten          View_2           1 1 Addmm_3 View_2
 Convolution      ConvNd_7         1 1 Threshold_4_ConvNd_7 ConvNd_7 0=64 1=3 2=1 3=1 4=1 5=1 6=36864
 ReLU             Threshold_9      1 1 ConvNd_7 Threshold_9 0=0.000000
 Convolution      ConvNd_8         1 1 Threshold_9 ConvNd_8 0=64 1=3 2=1 3=1 4=1 5=0 6=36864
-Eltwise          Add_1            2 1 View_2 ConvNd_8 Add_1 0=1
+Reshape          Reshape_1        1 1 View_2 Reshape_1 0=1 1=1 2=64
+Tile             Tile_1           1 1 Reshape_1 Tile_1 0=2 1=16
+Tile             Tile_2           1 1 Tile_1 Tile_2 0=1 1=16
+Eltwise          Add_1            2 1 Tile_2 ConvNd_8 Add_1 0=1
 ReLU             Threshold_10     1 1 Add_1 Threshold_10 0=0.000000
 Convolution      ConvNd_9         1 1 Threshold_10 ConvNd_9 0=96 1=1 2=1 3=1 4=0 5=1 6=6144
-Slice            ConvNd_9_slicer  1 8 ConvNd_9 ConvNd_9_Index_1 ConvNd_9_Index_2 ConvNd_9_Index_3 ConvNd_9_Index_4 ConvNd_9_Index_5 ConvNd_9_Index_6 ConvNd_9_Index_7 ConvNd_9_Index_8 -23300=8,12,12,12,12,12,12,12,-233 1=0
-ExpandDims       Unsqueeze_1      1 1 ConvNd_9_Index_1 Unsqueeze_1 0=0 1=1 2=0 3=0
-ExpandDims       Unsqueeze_2      1 1 ConvNd_9_Index_2 Unsqueeze_2 0=0 1=1 2=0 3=0
-ExpandDims       Unsqueeze_3      1 1 ConvNd_9_Index_3 Unsqueeze_3 0=0 1=1 2=0 3=0
-ExpandDims       Unsqueeze_4      1 1 ConvNd_9_Index_4 Unsqueeze_4 0=0 1=1 2=0 3=0
-ExpandDims       Unsqueeze_5      1 1 ConvNd_9_Index_5 Unsqueeze_5 0=0 1=1 2=0 3=0
-ExpandDims       Unsqueeze_6      1 1 ConvNd_9_Index_6 Unsqueeze_6 0=0 1=1 2=0 3=0
-ExpandDims       Unsqueeze_7      1 1 ConvNd_9_Index_7 Unsqueeze_7 0=0 1=1 2=0 3=0
-ExpandDims       Unsqueeze_8      1 1 ConvNd_9_Index_8 Unsqueeze_8 0=0 1=1 2=0 3=0
-Concat           Concat_1         8 1 Unsqueeze_1 Unsqueeze_2 Unsqueeze_3 Unsqueeze_4 Unsqueeze_5 Unsqueeze_6 Unsqueeze_7 Unsqueeze_8 Concat_1 0=1
-Convolution      ConvNd_10        1 1 highres ConvNd_10 0=3 1=1 2=1 3=1 4=0 5=1 6=9
-PiecewiseThresh  Piecewise_1      1 1 ConvNd_10 Piecewise_1
-Convolution      ConvNd_11        1 1 Piecewise_1 ConvNd_11 0=1 1=1 2=1 3=1 4=0 5=1 6=3
-Clip             Hardtanh_1       1 1 ConvNd_11 Hardtanh_1 0=0 1=1
+
